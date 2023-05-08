@@ -2,7 +2,7 @@
 
 const APIKEY = config.APIKEY;
 const forecastAPI = "https://api.openweathermap.org/data/2.5/forecast";
-const geocodingAPI = "http://api.openweathermap.org/geo/1.0/direct";
+const geocodingAPI = "https://api.openweathermap.org/geo/1.0/direct";
 
 var header = $("header");
 header.addClass(
