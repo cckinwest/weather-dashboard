@@ -1,6 +1,6 @@
-//const APIKEY = "b6f0ccf06b4649cf66be86ca82eec322";
+const APIKEY = "b6f0ccf06b4649cf66be86ca82eec322";
 
-const APIKEY = config.APIKEY;
+//const APIKEY = config.APIKEY;
 const forecastAPI = "https://api.openweathermap.org/data/2.5/forecast";
 const geocodingAPI = "https://api.openweathermap.org/geo/1.0/direct";
 
