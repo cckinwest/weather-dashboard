@@ -18,6 +18,7 @@ var forecastPanel = $("#forecastWeather");
 var cityField = $(".cityField");
 var searchBtn = $(".searchBtn");
 
+//this function will get the current weather of a certain place with postion (lat, lon)
 function current(lat, lon) {
   var url = `${currentAPI}?lat=${lat}&lon=${lon}&units=metric&appid=${APIKEY}`;
 
@@ -43,7 +44,7 @@ function current(lat, lon) {
 
         var infoPanel = $("<div></div>");
 
-        infoPanel.addClass("bg-info border rounded-3 p-3");
+        infoPanel.addClass("col m-auto bg-info border rounded-3 p-3");
 
         var cityTitle = $("<p></p>")
           .text(`${city} (${date})`)
@@ -66,7 +67,6 @@ function current(lat, lon) {
           .text(`Humidity: ${humidity}%`)
           .appendTo(infoPanel);
 
-        infoPanel.addClass("col m-auto");
         infoPanel.appendTo(currentPanel);
       } else {
         errorHandling();
@@ -74,6 +74,7 @@ function current(lat, lon) {
     });
 }
 
+//this function will get the weather forecast of a certain place with postion (lat, lon)
 function forecast(lat, lon) {
   var url = `${forecastAPI}?lat=${lat}&lon=${lon}&units=metric&appid=${APIKEY}`;
 
@@ -100,7 +101,7 @@ function forecast(lat, lon) {
 
           var infoPanel = $("<div></div>");
 
-          infoPanel.addClass("col bg-info border rounded-3 p-3 m-auto");
+          infoPanel.addClass("col bg-info border rounded-3 h-100 p-3 m-auto");
 
           var cityTitle = $("<p></p>")
             .text(`${city} (${date})`)
@@ -131,6 +132,7 @@ function forecast(lat, lon) {
     });
 }
 
+//display error message when there are error, either an abnormal response status or a return of empty array
 function errorHandling() {
   currentPanel.empty();
   forecastPanel.empty();
@@ -141,6 +143,7 @@ function errorHandling() {
     .appendTo(currentPanel);
 }
 
+//create a button and a trash button pair
 function createBtn(city) {
   var historyBtn = $("<button></button>");
   historyBtn.text(city);
@@ -166,6 +169,7 @@ function createBtn(city) {
   }).appendTo(clearBtn);
 }
 
+//the function of a trash button
 function clear() {
   var city = $(this).attr("id");
   var history = JSON.parse(localStorage.getItem("history"));
@@ -190,14 +194,17 @@ function clear() {
   }
 }
 
-function searchWeather(city) {
+//this function search weather by giving the name of a city.
+async function searchWeather(city) {
   var url = `${geocodingAPI}?q=${city}&limit=1&appid=${APIKEY}`;
-
-  fetch(url)
+  var isError = false;
+  //await is needed to wait for the return of isError
+  await fetch(url)
     .then(function (response) {
       if (response.status === 200) {
         return response.json();
       } else {
+        isError = true;
         errorHandling();
       }
     })
@@ -212,12 +219,17 @@ function searchWeather(city) {
         current(lat, lon);
         forecast(lat, lon);
       } else {
+        isError = true;
         errorHandling();
       }
     });
+
+  return isError;
+  //true is returned if error occurs
 }
 
 searchBtn.on("click", () => {
+  isError = false;
   currentPanel.empty();
   forecastPanel.empty();
 
@@ -228,13 +240,13 @@ searchBtn.on("click", () => {
     history = JSON.parse(localStorage.getItem("history"));
   }
 
-  searchWeather(city);
-
-  if (!history.includes(city)) {
-    createBtn(city);
-    history.push(city);
-    localStorage.setItem("history", JSON.stringify(history));
-  }
+  searchWeather(city).then((isError) => {
+    if (!history.includes(city) && !isError) {
+      createBtn(city);
+      history.push(city);
+      localStorage.setItem("history", JSON.stringify(history));
+    }
+  });
 });
 
 $(function () {
