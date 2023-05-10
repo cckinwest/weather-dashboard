@@ -135,8 +135,6 @@ function errorHandling() {
   currentPanel.empty();
   forecastPanel.empty();
 
-  console.log("Something goes wrong. Check if you enter correctly.");
-
   $("<h1></h1>")
     .text("Something goes wrong. Check if you enter correctly.")
     .addClass("display-1")
@@ -201,7 +199,6 @@ function searchWeather(city) {
         return response.json();
       } else {
         errorHandling();
-        return false;
       }
     })
     .then(function (data) {
@@ -214,16 +211,16 @@ function searchWeather(city) {
 
         current(lat, lon);
         forecast(lat, lon);
-
-        return true;
       } else {
         errorHandling();
-        return false;
       }
     });
 }
 
 searchBtn.on("click", () => {
+  currentPanel.empty();
+  forecastPanel.empty();
+
   var city = cityField.val();
   var history = [];
 
@@ -231,7 +228,9 @@ searchBtn.on("click", () => {
     history = JSON.parse(localStorage.getItem("history"));
   }
 
-  if (!history.includes(city) && searchWeather(city)) {
+  searchWeather(city);
+
+  if (!history.includes(city)) {
     createBtn(city);
     history.push(city);
     localStorage.setItem("history", JSON.stringify(history));
